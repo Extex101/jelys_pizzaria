@@ -15,6 +15,28 @@ minetest.register_craft({
 	output = "jelys_pizzaria:sauce",
 	recipe = {"jelys_pizzaria:tomato", "vessels:glass_bottle"},
 })
+minetest.register_craft({
+	output = "jelys_pizzaria:pepperoni_uncured",
+	recipe = {
+		{"jelys_pizzaria:meat"},
+		{"jelys_pizzaria:meat"},
+		{"jelys_pizzaria:meat"}
+	},
+})
+minetest.register_craft({
+	type = "shapeless",
+	output = "jelys_pizzaria:meatball",
+	recipe = {"jelys_pizzaria:meat"},
+})
+
+minetest.register_craft({
+	output = "jelys_pizzaria:pizza_cutter",
+	recipe = {
+		{"","default:steel_ingot", "default:steel_ingot"},
+		{"","group:stick", "default:steel_ingot"},
+		{"group:stick", "", ""}
+	},
+})
 
 minetest.register_craft({
 	type = "shapeless",
@@ -52,6 +74,11 @@ minetest.register_craftitem("jelys_pizzaria:olives", {
 	inventory_image = "jelys_pizzaria_olives.png",
 })
 
+minetest.register_craftitem("jelys_pizzaria:meatball", {
+	description = "Meatballs",
+	inventory_image = "jelys_pizzaria_meatball.png",
+})
+
 minetest.register_craftitem("jelys_pizzaria:sauce", {
 	description = "Tomato Sauce",
 	inventory_image = "jelys_pizzaria_sauce.png",
@@ -62,15 +89,7 @@ minetest.register_craftitem("jelys_pizzaria:meat", {
 	inventory_image = "jelys_pizzaria_meat.png",
 })
 
-minetest.register_craftitem("jelys_pizzaria:pepperoni_uncured", {
-	description = "Uncured Pepperoni",
-	inventory_image = "jelys_pizzaria_meat_pepperoni_uncured.png",
-})
 
-minetest.register_craftitem("jelys_pizzaria:pepperoni_cured", {
-	description = "Cured Pepperoni",
-	inventory_image = "jelys_pizzaria_meat_pepperoni_cured.png",
-})
 
 minetest.register_node("jelys_pizzaria:pineapple", {
 	description = "Pineapple",
