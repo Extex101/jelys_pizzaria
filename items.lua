@@ -43,10 +43,21 @@ jpizza.register_pizza("jelys_pizzaria:burnt_pizza", {
 minetest.register_craftitem("jelys_pizzaria:burnt_pizza_slice", {
 	description = "Burnt Pizza Slice",
 	inventory_image = "jelys_pizzaria_burnt_pizza_slice.png",
+	on_use = function(itemstack, player, pointed_thing)
+		minetest.chat_send_player(player:get_player_name(), "Blecht")
+		return minetest.do_item_eat(-2, "", itemstack, player, pointed_thing)
+	end
 })
-
+if jpizza.has_depends.hunger_ng then
+	hunger_ng.add_hunger_data("jelys_pizzaria:burnt_pizza_slice", {satiates = -3, heals = -2})
+	hunger_ng.add_hunger_data("jelys_pizzaria:burnt_pizza_slice", {satiates = 1})
+end
+if jpizza.has_depends.hbhunger then
+	hbhunger.register_food("jelys_pizzaria:burnt_pizza_slice", 0, "", 2)
+	hbhunger.register_food("jelys_pizzaria:cheese_pizza_slice", 1)
+end
 minetest.register_craftitem("jelys_pizzaria:cheese_pizza_slice", {
-	description = "Burnt Pizza Slice",
+	description = "Slice of Cheese Pizza",
 	inventory_image = "jelys_pizzaria_pizza_slice.png",
 	on_use = function(itemstack, player, pointed_thing)
 		minetest.chat_send_player(player:get_player_name(), "Blecht")

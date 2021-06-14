@@ -2,7 +2,7 @@ function jpizza.register_topping(def)
 	local newdef = def
 	--minetest.register_craft(newdef.craft)
 	--minetest.register_craftitem(name, def)
-	table.insert(jpizza.toppings, {name=def.name, texture=def.texture, item=def.item, cooked_texture=def.cooked_texture, topping_inv=def.topping_inv})
+	table.insert(jpizza.toppings, {name=def.name, texture=def.texture, item=def.item, cooked_texture=def.cooked_texture, topping_inv=def.topping_inv, eat=def.eat})
 end
 
 local function find(value, key, list)
@@ -62,8 +62,8 @@ local cooked_texture = "jelys_pizzaria_cooked_dough.png^"..
 	"jelys_pizzaria_pizza_cooked_cheese.png^"
 function jpizza.spawn_slices(pos, item)
 	for i = 0, 5, 1 do
-		local x = pos.x+math.sin(i*72)/3
-		local z = pos.z+math.cos(i*72)/3
+		local x = pos.x+math.sin(i*60)/3
+		local z = pos.z+math.cos(i*60)/3
 		minetest.add_item({x=x, y=pos.y, z=z}, item)
 	end
 end
@@ -112,12 +112,19 @@ function jpizza.make_pizzas()
 					minetest.remove_node(pos)
 				end
 			end,
-			done=true
+			done = true
 		})
 		minetest.register_craftitem("jelys_pizzaria:pizza_"..base.name.."_slice", {
 			description = "Slice of "..base.name.." Pizza",
-			inventory_image = "jelys_pizzaria_pizza_slice.png^"..base.topping_inv[2]
+			inventory_image = "jelys_pizzaria_pizza_slice.png^"..base.topping_inv[2],
+			on_use = minetest.item_eat(1+base.eat)
 		})
+		if jpizza.has_depends.hunger_ng then
+			hunger_ng.add_hunger_data("jelys_pizzaria:pizza_"..base.name.."_slice", {satiates = 1+base.eat})
+		end
+		if jpizza.has_depends.hbhunger then
+			hbhunger.register_food("jelys_pizzaria:pizza_"..base.name.."_slice", 1+base.eat)
+		end
 		minetest.register_craft({
 		    type = "cooking",
 		    output = "jelys_pizzaria:pizza_"..base.name,
@@ -172,8 +179,15 @@ function jpizza.make_pizzas()
 				end
 				minetest.register_craftitem(pizza_name.."_slice", {
 					description = "Slice of "..base.name.." and "..side.name.." Pizza",
-					inventory_image = "jelys_pizzaria_pizza_slice.png^"..base.topping_inv[num1].."^"..side.topping_inv[num2]
+					inventory_image = "jelys_pizzaria_pizza_slice.png^"..base.topping_inv[num1].."^"..side.topping_inv[num2],
+					on_use = minetest.item_eat(1+base.eat+side.eat)
 				})
+				if jpizza.has_depends.hunger_ng == true then
+					hunger_ng.add_hunger_data(pizza_name.."_slice", {satiates = 1+base.eat+side.eat})
+				end
+				if jpizza.has_depends.hbhunger == true then
+					hbhunger.register_food(pizza_name.."_slice", 1+base.eat+side.eat)
+				end
 				minetest.register_craft({
 				    type = "cooking",
 				    output = pizza_name,
