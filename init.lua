@@ -1,7 +1,7 @@
 jpizza = {}
 jpizza.toppings = {}
 
-jpizza.op_depends = {"hunger_ng", "hbhunger"}
+jpizza.op_depends = {"hunger_ng", "hbhunger", "pineapple", "mobs", "creatures"}
 jpizza.has_depends = {}
 for _, i in pairs(jpizza.op_depends) do
 	if minetest.get_modpath(i) then
@@ -14,17 +14,13 @@ end
 jpizza.path = minetest.get_modpath("jelys_pizzaria")
 dofile(jpizza.path.."/functions.lua")
 
-minetest.register_tool("jelys_pizzaria:pizza_cutter", {
-	description = "Pizza Cutter",
-	inventory_image = "jelys_pizzaria_pizza_cutter.png",
-	wield_image = "jelys_pizzaria_pizza_cutter.png^[transformFX"
-})
-
-dofile(jpizza.path.."/mutation_backup.lua")
-
 dofile(jpizza.path.."/nodes.lua")--nodes
 
+dofile(jpizza.path.."/oven.lua")
+
 dofile(jpizza.path.."/items.lua")
+
+
 
 jpizza.register_topping({
 	item = "jelys_pizzaria:olives",
@@ -51,14 +47,14 @@ jpizza.register_topping({
 })
 
 jpizza.register_topping({
-	item = "jelys_pizzaria:meatball",
-	name = "meatballs",
+	item = "jelys_pizzaria:sausage",
+	name = "sausage",
 	topping_inv = {
-		"jelys_pizzaria_topping_meatball_inv_1.png", 
-		"jelys_pizzaria_topping_meatball_inv_2.png"
+		"jelys_pizzaria_topping_sausage_inv_1.png", 
+		"jelys_pizzaria_topping_sausage_inv_2.png"
 	},
-	texture = "jelys_pizzaria_topping_meatball.png",
-	cooked_texture = "jelys_pizzaria_topping_meatball_cooked.png",
+	texture = "jelys_pizzaria_topping_sausage.png",
+	cooked_texture = "jelys_pizzaria_topping_sausage_cooked.png",
 	eat = 4,
 })
 
@@ -74,16 +70,6 @@ jpizza.register_topping({
 	eat = 1,
 })
 
-jpizza.register_topping({
-	item = "jelys_pizzaria:pineapple",
-	name = "pineapple",
-	topping_inv = {
-		"jelys_pizzaria_topping_pineapple_inv_1.png",
-		"jelys_pizzaria_topping_pineapple_inv_2.png",
-	},
-	texture = "jelys_pizzaria_topping_pineapple.png",
-	cooked_texture = "jelys_pizzaria_topping_pineapple_cooked.png",
-	eat = 3,
-})
+dofile(jpizza.path.."/mutation_backup.lua")
 
 jpizza.make_pizzas()

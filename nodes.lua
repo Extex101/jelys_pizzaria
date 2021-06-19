@@ -32,10 +32,15 @@ minetest.register_node("jelys_pizzaria:dough", {
 			{-0.125, -0.5, -0.1875, 0.125, -0.1875, 0.125},
 		}
 	},
-	
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		if digger:get_wielded_item():get_name() == "jelys_pizzaria:rolling_pin" then
+	on_dig = function(pos, node, player)
+		local protected = minetest.is_protected(pos, player:get_player_name())
+		local wielded = player:get_wielded_item()
+		if wielded:get_name() == "jelys_pizzaria:rolling_pin" then
 			minetest.set_node(pos, {name = "jelys_pizzaria:dough_rolled"})
+		else
+			if not protected then
+				minetest.node_dig(pos, node, player)
+			end
 		end
 	end,
 	sounds = {
@@ -51,10 +56,20 @@ jpizza.register_pizza("jelys_pizzaria:dough_rolled", {
 		"jelys_pizzaria_pizza_dough.png",
 		"jelys_pizzaria_pizza_dough.png"
 	},
-	drop = "jelys_pizzaris:dough",
+	drop = "jelys_pizzaria:dough",
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		if itemstack:get_name() == "jelys_pizzaria:sauce" then
+			if not minetest.is_creative_enabled(player:get_player_name()) then
+				itemstack:take_item()
+				local inv = player:get_inventory()
+				if inv:room_for_item("main", "vessels:glass_bottle") then
+					inv:add_item("main", "vessels:glass_bottle")
+				else
+					minetest.add_item({x=pos.x, y=pos.y+1, z=pos.z}, "vessels:glass_bottle")
+				end
+			end
 			minetest.set_node(pos, {name="jelys_pizzaria:dough_with_sauce"})
+			return itemstack
 		end
 	end,
 })
@@ -80,6 +95,7 @@ jpizza.register_pizza("jelys_pizzaria:raw_cheese_pizza", {
 		"jelys_pizzaria_pizza_dough.png^jelys_pizzaria_pizza_sauce.png^jelys_pizzaria_pizza_cheese.png",
 		"jelys_pizzaria_pizza_dough.png"
 	},
+	cooked = "jelys_pizzaria:cheese_pizza",
 	cook_time = {min=50, max = 100},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		local name = itemstack:get_name()
@@ -264,56 +280,4 @@ minetest.register_node("jelys_pizzaria:pizza_box", {
 			{-0.501, -0.5, -0.501, 0.501, -0.375, 0.501}
 		},
 	},
-})
-
-minetest.register_node("jelys_pizzaria:pizza_oven", {
-	description = "Pizza Oven",
-	drawtype = "mesh",
-	paramtype2 = "facedir",
-	tiles = {
-		"jelys_pizzaria_pizza_oven.png",
-	},
-	mesh = "jelys_pizzaria_pizza_oven.obj",
-	selection_box = {
-		type = "fixed",
-		fixed = {
-			{-0.5, -0.5, -0.5, -0.3125, 0.5, 0.5}, -- NodeBox1
-			{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}, -- NodeBox2
-			{0.3125, -0.5, -0.5, 0.5, 0.5, 0.5}, -- NodeBox3
-			{-0.5, 0.125, -0.5, 0.5, 0.5, 0.5}, -- NodeBox4
-			{-0.5625, -0.5, -0.4375, 0.5625, 0.5, 0.5}, -- NodeBox5
-			--{-0.4375, 0.5, -0.0625, 0.4375, 1.0625, 0.5}, -- NodeBox6
-			--{-0.5625, 0.5, -0.4375, -0.3125, 1.0625, 0.4375}, -- NodeBox7
-			--{0.3125, 0.5, -0.4375, 0.5625, 1, 0.5}, -- NodeBox8
-			--{-0.5625, 0.75, -0.4375, 0.5625, 1.0625, 0.5}, -- NodeBox9
-			--{-0.5625, 0.5, -0.4375, 0.5625, 0.625, -0.375}, -- NodeBox10
-		}
-	},
-	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-		local name = itemstack:get_name()
-		local def = minetest.registered_nodes[name]
-		if def and def.raw and def.cook_time and def.cooked then
-			local up = {x = pos.x, y = pos.y+1, z = pos.z}
-			local itemdef = minetest.registered_nodes[name]
-			local cook_time = itemdef.cook_time
-			minetest.set_node(up, {name = name})
-			minetest.get_node_timer(pos):start(math.random(cook_time.min, cook_time.max))
-			if not minetest.is_creative_enabled(player:get_player_name()) then
-				itemstack:take_item()
-			end
-		end
-		return itemstack
-	end,
-	on_timer = function(pos)
-		local uppos = {x = pos.x, y = pos.y+1, z = pos.z}
-		local up = minetest.get_node(uppos)
-		local def = minetest.registered_nodes[up.name]
-		if def.cooked then
-			minetest.set_node(uppos, {name=def.cooked})
-			minetest.get_node_timer(pos):start(70)
-		end
-		if def.done then
-			minetest.set_node(uppos, {name="jelys_pizzaria:burnt_pizza"})
-		end
-	end,
 })
