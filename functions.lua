@@ -33,6 +33,7 @@ function jpizza.register_pizza(name, def)
 			{-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
 		}
 	}
+	newDef.stack_max = 1
 	newDef.node_box = {
 		type = "fixed",
 		fixed = {
@@ -82,7 +83,7 @@ function jpizza.make_pizzas()
 			toppings = 1,
 			on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 				local name = itemstack:get_name()
-				minetest.chat_send_all(name)
+				
 				local fetch = find(name, "item", jpizza.toppings)
 				if fetch then
 					local stuff = jpizza.toppings[fetch]
@@ -104,11 +105,12 @@ function jpizza.make_pizzas()
 			},
 			
 			on_punch = function(pos, oldnode, digger)
-				--if not digger:is_player() then return end
 				local itemstack = digger:get_wielded_item()
-				--minetest.chat_send_all(itemstack:get_name())
 				if itemstack:get_name() == "jelys_pizzaria:pizza_cutter" then
 					jpizza.spawn_slices(pos, "jelys_pizzaria:pizza_"..base.name.."_slice")
+					local wear = itemstack:get_wear()
+					itemstack:set_wear(wear+(65535/40))
+					digger:set_wielded_item(itemstack)
 					minetest.remove_node(pos)
 				end
 			end,
@@ -117,6 +119,7 @@ function jpizza.make_pizzas()
 		minetest.register_craftitem("jelys_pizzaria:pizza_"..base.name.."_slice", {
 			description = "Slice of "..base.name.." Pizza",
 			inventory_image = "jelys_pizzaria_pizza_slice.png^"..base.topping_inv[2],
+			stack_max = 6,
 			on_use = minetest.item_eat(1+base.eat)
 		})
 		if jpizza.has_depends.hunger_ng then
@@ -162,11 +165,12 @@ function jpizza.make_pizzas()
 						"jelys_pizzaria_cooked_dough.png"
 					},
 					on_punch = function(pos, oldnode, digger)
-						--if not digger:is_player() then return end
 						local itemstack = digger:get_wielded_item()
-						--minetest.chat_send_all(itemstack:get_name())
 						if itemstack:get_name() == "jelys_pizzaria:pizza_cutter" then
 							jpizza.spawn_slices(pos, pizza_name.."_slice")
+							local wear = itemstack:get_wear()
+							itemstack:set_wear(wear+(65535/40))
+							digger:set_wielded_item(itemstack)
 							minetest.remove_node(pos)
 						end
 					end,
@@ -180,20 +184,16 @@ function jpizza.make_pizzas()
 				minetest.register_craftitem(pizza_name.."_slice", {
 					description = "Slice of "..base.name.." and "..side.name.." Pizza",
 					inventory_image = "jelys_pizzaria_pizza_slice.png^"..base.topping_inv[num1].."^"..side.topping_inv[num2],
+					stack_max = 6,
 					on_use = minetest.item_eat(1+base.eat+side.eat)
 				})
+				minetest.register_alias(pizza_name.."_slice", "jelys_pizzaria:pizza_"..side.name.."_"..base.name)--yeah this shouldn't be a problem except for modders
 				if jpizza.has_depends.hunger_ng == true then
 					hunger_ng.add_hunger_data(pizza_name.."_slice", {satiates = 1+base.eat+side.eat})
 				end
 				if jpizza.has_depends.hbhunger == true then
 					hbhunger.register_food(pizza_name.."_slice", 1+base.eat+side.eat)
 				end
-				minetest.register_craft({
-				    type = "cooking",
-				    output = pizza_name,
-				    recipe = "jelys_pizzaria:raw_pizza_"..base.name.."_"..side.name,
-				    cooktime = 1,
-				})
 			end
 		end
 	end
