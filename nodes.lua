@@ -267,17 +267,53 @@ minetest.register_node("jelys_pizzaria:pepperoni_cured", {
 	},
 })
 
-minetest.register_node("jelys_pizzaria:pizza_box", {
-	description = "Pizza Box",
-	drawtype = "nodebox",
+minetest.register_node("jelys_pizzaria:pizza_box_closed", {
+	description = "Pizza Box Closed",
+	drawtype = "mesh",
 	paramtype2 = "facedir",
 	tiles = {
 		"jelys_pizzaria_pizza_box.png",
 	},
-	node_box = {
+	mesh = "jelys_pizzaria_pizza_box_closed.obj",
+	collision_box = {
 		type = "fixed",
 		fixed = {
 			{-0.501, -0.5, -0.501, 0.501, -0.375, 0.501}
 		},
 	},
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.501, -0.5, -0.501, 0.501, -0.375, 0.501}
+		},
+	},
+	on_rightclick = function(pos)
+		minetest.set_node(pos, {name="jelys_pizzaria:pizza_box_open"})
+		return itemstack
+	end,
+})
+minetest.register_node("jelys_pizzaria:pizza_box_open", {
+	description = "Pizza Box",
+	drawtype = "mesh",
+	paramtype2 = "facedir",
+	tiles = {
+		"jelys_pizzaria_pizza_box.png",
+	},
+	mesh = "jelys_pizzaria_pizza_box_open.obj",
+	collision_box = {
+		type = "fixed",
+		fixed = {
+			{-0.501, -0.5, -0.501, 0.501, -0.375, 0.501}
+		},
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.501, -0.5, -0.501, 0.501, -0.4375, 0.501}
+		},
+	},
+	on_rightclick = function(pos)
+		minetest.set_node(pos, {name="jelys_pizzaria:pizza_box_closed"})
+		return itemstack
+	end,
 })
