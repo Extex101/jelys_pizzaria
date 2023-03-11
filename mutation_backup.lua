@@ -34,22 +34,6 @@ minetest.register_craft({
 	output = "jelys_pizzaria:sauce",
 	recipe = {tomato, "vessels:glass_bottle"},
 })
-minetest.register_craft({
-	output = "jelys_pizzaria:pepperoni_uncured",
-	recipe = {
-		{"jelys_pizzaria:meat"},
-		{"jelys_pizzaria:meat"},
-		{"jelys_pizzaria:meat"}
-	},
-})
-minetest.register_craft({
-	output = "jelys_pizzaria:sausage",
-	recipe = {
-		{"","",""},
-		{"jelys_pizzaria:meat","jelys_pizzaria:meat","jelys_pizzaria:meat"},
-		{"","",""}
-	},
-})
 
 minetest.register_craft({
 	type = "shapeless",
