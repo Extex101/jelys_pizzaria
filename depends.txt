@@ -3,3 +3,8 @@ vessels
 flowers
 hunger_ng?
 nbhunger?
+pineapple?
+mobs?
+creatures?
+stairs?
+fire?

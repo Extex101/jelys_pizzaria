@@ -1,7 +1,5 @@
 function jpizza.register_topping(def)
 	local newdef = def
-	--minetest.register_craft(newdef.craft)
-	--minetest.register_craftitem(name, def)
 	table.insert(jpizza.toppings, {name=def.name, texture=def.texture, item=def.item, cooked_texture=def.cooked_texture, topping_inv=def.topping_inv, eat=def.eat})
 end
 
@@ -24,6 +22,7 @@ function jpizza.register_pizza(name, def)
 	if def.toppings == 1 then
 		newDef.groups.pizza = 1
 	end
+	newDef.use_texture_alpha = "clip"
 	newDef.drawtype = "nodebox"
 	newDef.paramtype = "light"
 	newDef.sunlight_propagates = true
@@ -70,7 +69,6 @@ function jpizza.spawn_slices(pos, item)
 end
 function jpizza.make_pizzas()
 	for i, base in pairs(jpizza.toppings) do
-		minetest.log(dump(jpizza.toppings))
 		jpizza.register_pizza("jelys_pizzaria:raw_pizza_"..base.name, {
 			description = "Raw Pizza with "..base.name,
 			texture = {
@@ -105,8 +103,10 @@ function jpizza.make_pizzas()
 			},
 			
 			on_punch = function(pos, oldnode, digger)
+				local down = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
 				local itemstack = digger:get_wielded_item()
-				if itemstack:get_name() == "jelys_pizzaria:pizza_cutter" then
+				local downdef = minetest.registered_nodes[down.name]
+				if itemstack:get_name() == "jelys_pizzaria:pizza_cutter" and downdef.groups.pizza_oven == nil then
 					jpizza.spawn_slices(pos, "jelys_pizzaria:pizza_"..base.name.."_slice")
 					local wear = itemstack:get_wear()
 					itemstack:set_wear(wear+(65535/40))
@@ -128,12 +128,6 @@ function jpizza.make_pizzas()
 		if jpizza.has_depends.hbhunger then
 			hbhunger.register_food("jelys_pizzaria:pizza_"..base.name.."_slice", 1+base.eat)
 		end
-		minetest.register_craft({
-		    type = "cooking",
-		    output = "jelys_pizzaria:pizza_"..base.name,
-		    recipe = "jelys_pizzaria:raw_pizza_"..base.name,
-		    cooktime = 1,
-		})
 		for j = i, #jpizza.toppings, 1 do
 			local side = jpizza.toppings[j]
 			if side.name ~= base.name then
@@ -165,8 +159,10 @@ function jpizza.make_pizzas()
 						"jelys_pizzaria_cooked_dough.png"
 					},
 					on_punch = function(pos, oldnode, digger)
+						local down = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
 						local itemstack = digger:get_wielded_item()
-						if itemstack:get_name() == "jelys_pizzaria:pizza_cutter" then
+						local downdef = minetest.registered_nodes[down.name]
+						if itemstack:get_name() == "jelys_pizzaria:pizza_cutter" and downdef.groups.pizza_oven == nil then
 							jpizza.spawn_slices(pos, pizza_name.."_slice")
 							local wear = itemstack:get_wear()
 							itemstack:set_wear(wear+(65535/40))

@@ -4,16 +4,35 @@ minetest.register_craftitem("jelys_pizzaria:mese_mutator", {
 	inventory_image = "jelys_pizzaria_mese_mutation_crystal.png",
 })
 
+local f = "default:mese_crystal_fragment"
+local m = "default:mese_crystal"
 minetest.register_craft({
-	type = "shapeless",
-	output = "jelys_pizzaria:tomato",
-	recipe = {"default:apple", mutagen},
+	output = "jelys_pizzaria:mese_mutator 4",
+	recipe = {
+		{"", f, ""},
+		{f, m, f},
+	}
 })
+
+local tomato = "jelys_pizzaria:tomato"
+if farming and farming.mod == "redo" then
+	tomato = "farming:tomato"
+else
+	minetest.register_craftitem("jelys_pizzaria:tomato", {
+		description = "Tomato",
+		inventory_image = "jelys_pizzaria_tomato.png",
+	})
+	minetest.register_craft({
+		type = "shapeless",
+		output = "jelys_pizzaria:tomato",
+		recipe = {"default:apple", mutagen},
+	})
+end
 
 minetest.register_craft({
 	type = "shapeless",
 	output = "jelys_pizzaria:sauce",
-	recipe = {"jelys_pizzaria:tomato", "vessels:glass_bottle"},
+	recipe = {tomato, "vessels:glass_bottle"},
 })
 minetest.register_craft({
 	output = "jelys_pizzaria:pepperoni_uncured",
@@ -33,23 +52,9 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "jelys_pizzaria:pizza_cutter",
-	recipe = {
-		{"","default:steel_ingot", "default:steel_ingot"},
-		{"","group:stick", "default:steel_ingot"},
-		{"group:stick", "", ""}
-	},
-})
-
-minetest.register_craft({
 	type = "shapeless",
 	output = "jelys_pizzaria:olives",
 	recipe = {"default:blueberries", mutagen},
-})
-
-minetest.register_craftitem("jelys_pizzaria:tomato", {
-	description = "Tomato",
-	inventory_image = "jelys_pizzaria_tomato.png",
 })
 
 minetest.register_craftitem("jelys_pizzaria:cheese", {
@@ -107,7 +112,7 @@ else
 		description = "Meat",
 		inventory_image = "jelys_pizzaria_meat.png",
 	})
-	
+
 end
 
 minetest.register_craft({
@@ -125,19 +130,16 @@ minetest.register_craft({
 	},
 })
 
+local pineapple = "jelys_pizzaria:pineapple"
 if jpizza.has_depends.pineapple then
-	jpizza.register_topping({
-		item = "pineapple:pineapple",
-		name = "pineapple",
-		topping_inv = {
-			"jelys_pizzaria_topping_pineapple_inv_1.png",
-			"jelys_pizzaria_topping_pineapple_inv_2.png",
-		},
-		texture = "jelys_pizzaria_topping_pineapple.png",
-		cooked_texture = "jelys_pizzaria_topping_pineapple_cooked.png",
-		eat = 3,
-	})
-else
+	minetest.register_alias("pineapple:pineapple", "jelys_pizzaria:pineapple")
+	pineapple = "pineapple:pineapple"
+end
+if farming and farming.mod == "redo" then
+	minetest.register_alias("farming:pineapple_ring", "jelys_pizzaria:pineapple")
+	pineapple = "farming:pineapple_ring"
+end
+if not jpizza.has_depends.pineapple and (not farming or farming and not farming.mod) then
 	minetest.register_node("jelys_pizzaria:pineapple", {
 		description = "Pineapple",
 		drawtype = "plantlike",
@@ -155,21 +157,20 @@ else
 		on_use = minetest.item_eat(2),
 		sounds = default.node_sound_leaves_defaults(),
 	})
-	jpizza.register_topping({
-		item = "jelys_pizzaria:pineapple",
-		name = "pineapple",
-		topping_inv = {
-			"jelys_pizzaria_topping_pineapple_inv_1.png",
-			"jelys_pizzaria_topping_pineapple_inv_2.png",
-		},
-		texture = "jelys_pizzaria_topping_pineapple.png",
-		cooked_texture = "jelys_pizzaria_topping_pineapple_cooked.png",
-		eat = 3,
-	})
 	minetest.register_craft({
 		type = "shapeless",
 		output = "jelys_pizzaria:pineapple",
 		recipe = {"default:pine_needles","default:pine_needles","default:apple", mutagen, mutagen},
 	})
 end
-
+jpizza.register_topping({
+	item = pineapple,
+	name = "pineapple",
+	topping_inv = {
+		"jelys_pizzaria_topping_pineapple_inv_1.png",
+		"jelys_pizzaria_topping_pineapple_inv_2.png",
+	},
+	texture = "jelys_pizzaria_topping_pineapple.png",
+	cooked_texture = "jelys_pizzaria_topping_pineapple_cooked.png",
+	eat = 3,
+})

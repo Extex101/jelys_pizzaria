@@ -16,11 +16,11 @@ minetest.register_node("jelys_pizzaria:dough", {
 	drawtype = "nodebox",
 	paramtype = "light",
 	sunlight_propagates = true,
-	--node_dig_prediction = "jelys_pizzaria:dough_rolled",
 	selection_box = {
 		type = "fixed",
 		fixed = {
-			{-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
+			-5 / 16, -0.5, -5 / 16,
+			5 / 16, 1 /16, 5 / 16
 		}
 	},
 	node_box = {
@@ -84,7 +84,11 @@ jpizza.register_pizza("jelys_pizzaria:dough_with_sauce", {
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		if itemstack:get_name() == "jelys_pizzaria:cheese" then
 			minetest.set_node(pos, {name="jelys_pizzaria:raw_cheese_pizza"})
+			if not minetest.is_creative_enabled(player:get_player_name()) then
+				itemstack:take_item()
+			end
 		end
+		return itemstack
 	end,
 })
 
@@ -120,16 +124,22 @@ jpizza.register_pizza("jelys_pizzaria:cheese_pizza", {
 	},
 	done = true,
 	on_punch = function(pos, oldnode, digger)
-		--if not digger:is_player() then return end
+		local down = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
 		local itemstack = digger:get_wielded_item()
-		--minetest.chat_send_all(itemstack:get_name())
-		if itemstack:get_name() == "jelys_pizzaria:pizza_cutter" then
+		local downdef = minetest.registered_nodes[down.name]
+		if itemstack:get_name() == "jelys_pizzaria:pizza_cutter" and downdef.groups.pizza_oven == nil then
 			jpizza.spawn_slices(pos, "jelys_pizzaria:cheese_pizza_slice")
 			minetest.remove_node(pos)
 		end
 	end,
 })
 
+minetest.register_craftitem("jelys_pizzaria:cheese_pizza_slice", {
+	description = "Slice of Cheese Pizza",
+	stack_max = 6,
+	inventory_image = "jelys_pizzaria_pizza_slice.png",
+	on_use = minetest.item_eat(1),
+})
 
 local function punch_pepperoni(pos, oldnode, digger)
 	local num = 0
@@ -179,7 +189,7 @@ minetest.register_node("jelys_pizzaria:pepperoni_uncured", {
 			end
 			if minetest.registered_nodes[upnode.name].walkable == false then
 				if placer:is_player() then minetest.chat_send_player(placer:get_player_name(), "Pepperoni has to be hung up to dry!") end
-				return minetest.item_place(itemstack, placer, pointed_thing)
+				return itemstack
 			else
 				local name = minetest.get_node(pos).name
 				if minetest.registered_nodes[name].buildable_to == true or name == "air" then
@@ -195,7 +205,7 @@ minetest.register_node("jelys_pizzaria:pepperoni_uncured", {
 	end,
 	on_punch = punch_pepperoni,
 	node_box = {
-		type = "fixed", 
+		type = "fixed",
 		fixed = {
 			{-0.125, -0.437, 0.125, 0.125, 0.125, -0.125},
 			{-0.125, 0.5, 0, 0.125, -0.5, 0},
@@ -252,7 +262,7 @@ minetest.register_node("jelys_pizzaria:pepperoni_cured", {
 	end,
 	on_punch = punch_pepperoni,
 	node_box = {
-		type = "fixed", 
+		type = "fixed",
 		fixed = {
 			{-0.125, -0.437, 0.125, 0.125, 0.125, -0.125},
 			{-0.125, 0.5, 0, 0.125, -0.5, 0},
@@ -267,6 +277,8 @@ minetest.register_node("jelys_pizzaria:pepperoni_cured", {
 	},
 })
 
+
+
 minetest.register_node("jelys_pizzaria:pizza_box_closed", {
 	description = "Pizza Box Closed",
 	drawtype = "mesh",
@@ -274,6 +286,7 @@ minetest.register_node("jelys_pizzaria:pizza_box_closed", {
 	tiles = {
 		"jelys_pizzaria_pizza_box.png",
 	},
+	groups = {oddly_breakable_by_hand=3},
 	mesh = "jelys_pizzaria_pizza_box_closed.obj",
 	collision_box = {
 		type = "fixed",
@@ -287,19 +300,57 @@ minetest.register_node("jelys_pizzaria:pizza_box_closed", {
 			{-0.501, -0.5, -0.501, 0.501, -0.375, 0.501}
 		},
 	},
-	on_rightclick = function(pos)
-		minetest.set_node(pos, {name="jelys_pizzaria:pizza_box_open"})
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		local inv = player:get_inventory()
+		local contents = minetest.get_meta(pos):get_string("pizza")
+		if contents and minetest.registered_nodes[contents] then
+			minetest.get_meta(pos):set_string("pizza", "")
+			minetest.swap_node(pos, {name="jelys_pizzaria:pizza_box_open", param2 = node.param2})
+			local leftover = itemstack:add_item(contents)
+			if leftover:is_empty() then
+				return itemstack
+			end
+			inv:add_item("main", leftover)
+		end
+		minetest.swap_node(pos, {name="jelys_pizzaria:pizza_box_open", param2=node.param2})
 		return itemstack
+	end,
+	on_dig = function(pos, node, player)
+		local meta = minetest.get_meta(pos)
+		local contents = meta:get_string("pizza")
+		if contents == "" or contents == nil then return end
+		local inv = player:get_inventory()
+		local item = ItemStack("jelys_pizzaria:pizza_box_closed")
+		local imeta = item:get_meta()
+		local def = minetest.registered_nodes[contents]
+		imeta:set_string("pizza", contents)
+		imeta:set_string("description", def.description)
+		if inv:room_for_item("main", item) then
+			inv:add_item("main", item)
+			minetest.remove_node(pos)
+			return
+		end
+	end,
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		local meta = minetest.get_meta(pos)
+		local imeta = itemstack:get_meta()
+
+		local pizza = imeta:get_string("pizza")
+		if pizza then
+			meta:set_string("pizza", pizza)
+		end
+
 	end,
 })
 minetest.register_node("jelys_pizzaria:pizza_box_open", {
-	description = "Pizza Box",
 	drawtype = "mesh",
 	paramtype2 = "facedir",
 	tiles = {
 		"jelys_pizzaria_pizza_box.png",
 	},
+	groups = {oddly_breakable_by_hand=3},
 	mesh = "jelys_pizzaria_pizza_box_open.obj",
+	drop = "jelys_pizzaria:pizza_box_closed",
 	collision_box = {
 		type = "fixed",
 		fixed = {
@@ -312,8 +363,63 @@ minetest.register_node("jelys_pizzaria:pizza_box_open", {
 			{-0.501, -0.5, -0.501, 0.501, -0.4375, 0.501}
 		},
 	},
-	on_rightclick = function(pos)
-		minetest.set_node(pos, {name="jelys_pizzaria:pizza_box_closed"})
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		local def = minetest.registered_nodes[itemstack:get_name()]
+		if def and def.done then
+			local meta = minetest.get_meta(pos)
+			meta:set_string("pizza", itemstack:get_name())
+			itemstack:take_item()
+		end
+		minetest.swap_node(pos, {name="jelys_pizzaria:pizza_box_closed", param2 = node.param2})
 		return itemstack
 	end,
 })
+
+minetest.register_node("jelys_pizzaria:reinforced_brick", {
+	description = "Reinforced Brick",
+	paramtype2 = "facedir",
+	place_param2 = 0,
+	tiles = {
+		"jelys_pizzaria_reinforced_brick_top.png^[transformFX",
+		"jelys_pizzaria_reinforced_brick_top.png",
+		"jelys_pizzaria_reinforced_brick3.png",
+		"jelys_pizzaria_reinforced_brick2.png^[transformFX",
+		"jelys_pizzaria_reinforced_brick.png^[transformFX",
+		"jelys_pizzaria_reinforced_brick.png",
+	},
+	groups = {cracky = 3, level = 1},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+if jpizza.has_depends.stairs then
+	local function my_register_stair_and_slab(subname, recipeitem, groups, images,
+		desc_stair, desc_slab, sounds, worldaligntex)
+	stairs.register_stair(subname, recipeitem, groups, images, desc_stair,
+		sounds, worldaligntex)
+		stairs.register_stair_inner(subname, recipeitem, groups, images, "",
+			sounds, worldaligntex, "Inner " .. desc_stair)
+		stairs.register_stair_outer(subname, recipeitem, groups, images, "",
+			sounds, worldaligntex, "Outer " .. desc_stair)
+		stairs.register_slab(subname, recipeitem, groups, images, desc_slab,
+			sounds, worldaligntex)
+	end
+
+
+	my_register_stair_and_slab(
+		"reinforced_brick",
+		"jelys_pizzaria:reinforced_brick",
+		{cracky=3},
+		{
+			"jelys_pizzaria_reinforced_brick_top.png^[transformFX",
+			"jelys_pizzaria_reinforced_brick_top.png",
+			"jelys_pizzaria_reinforced_brick3.png",
+			"jelys_pizzaria_reinforced_brick2.png^[transformFX",
+			"jelys_pizzaria_reinforced_brick.png^[transformFX",
+			"jelys_pizzaria_reinforced_brick.png"
+		},
+		"Reinforced Brick stair",
+		"Reinforced Brick slab",
+		default.node_sound_stone_defaults(),
+		false
+	)
+end

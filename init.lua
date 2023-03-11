@@ -1,7 +1,7 @@
 jpizza = {}
 jpizza.toppings = {}
 
-jpizza.op_depends = {"hunger_ng", "hbhunger", "pineapple", "mobs", "creatures"}
+jpizza.op_depends = {"hunger_ng", "hbhunger", "pineapple", "mobs", "creatures", "fire", "stairs", "dungeon_loot", "farming"}
 jpizza.has_depends = {}
 for _, i in pairs(jpizza.op_depends) do
 	if minetest.get_modpath(i) then
