@@ -237,8 +237,6 @@ minetest.register_node("jelys_pizzaria:pepperoni_cured", {
 	sunlight_propagates = true,
 	groups = {pepperoni = 1},
 	on_place = function(itemstack, placer, pointed_thing)
-		local pizzzzaa = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name].groups
-		minetest.chat_send_all(pointed_thing.type.." "..tostring(pizzzzaa.pizza==nil))
 		if pointed_thing.type == "node" then
 			local pos = pointed_thing.above
 			local upnode = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z})
