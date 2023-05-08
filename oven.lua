@@ -84,21 +84,21 @@ end
 local function start_timer(pos, elapsed)
 	--Pizza pos
 	local pizza_pos = {x=pos.x, y=pos.y+1, z=pos.z}
-	
+
 	--Meta values
 	local meta = minetest.get_meta(pos)
 	local cook_time_elapsed = meta:get_float("cook_time_elapsed")
 	local cook_time = meta:get_float("cook_time")
 	local fuel_time = meta:get_float("fuel_time")
 	local timer = minetest.get_node_timer(pos)
-	
+
 	--Node States
 	local pizza, cooked = pizza_above(pos)
 	local oven = get_oven_state(pos)
-	
+
 	--Mode specification
 	local mode = ""
-	
+
 	if not pizza and oven == "empty" then
 		mode = "empty"
 	elseif pizza == "raw" and oven == "active" then
@@ -110,7 +110,7 @@ local function start_timer(pos, elapsed)
 	elseif not pizza and oven ~= "empty" then
 		mode = "nopizza"
 	end
-	
+
 	--Run timers based on mode
 	if pizza and oven == "active" and cook_time > 0 then
 		meta:set_float("cook_time_elapsed", cook_time_elapsed+elapsed)
@@ -118,7 +118,7 @@ local function start_timer(pos, elapsed)
 	if oven == "active" and fuel_time > 0 then
 		meta:set_float("fuel_time", fuel_time-elapsed)
 	end
-	
+
 	--Update values
 	cook_time_elapsed = meta:get_float("cook_time_elapsed")
 	fuel_time = meta:get_float("fuel_time")
@@ -127,7 +127,7 @@ local function start_timer(pos, elapsed)
 		meta:set_float("cook_time", 0)
 		minetest.set_node(pizza_pos, {name = "jelys_pizzaria:pizza_oven_slot"})
 	end
-	
+
 	--Make a change
 	if cook_time_elapsed > cook_time and cooked then
 		minetest.set_node(pizza_pos, {name=cooked})
@@ -141,13 +141,13 @@ local function start_timer(pos, elapsed)
 			meta:set_float("cook_time", 0)
 		end
 	end
-	
+
 	--Infotext
 	local infotext = "Pizza: 100%\nFuel: none;"
-	
+
 	local fuel_percentage = math.ceil(0.5+fuel_time/fuel*98)
 	local cook_percentage = math.floor(0.5+cook_time_elapsed/cook_time*99)
-	
+
 	if mode == "nopizza" then
 		infotext = "Pizza: none;\n"..
 				"Fuel: ".. fuel_percentage.. "%"
@@ -178,7 +178,7 @@ local function start_timer(pos, elapsed)
 		oven_state = "Extinguished"
 	end
 	meta:set_string("infotext", infotext.."\n"..oven_state)
-	
+
 	--Start next timer
 	local tick = cook_time/fuel
 	timer:start(tick)
@@ -220,13 +220,12 @@ local function after_destruct(pos, oldnode)
 end
 
 minetest.register_node("jelys_pizzaria:pizza_oven_active", {
-	description = "Pizza Oven",
 	drawtype = "mesh",
 	paramtype2 = "facedir",
 	paramtype = "light",
 	light_source = 8,
 	drop = "jelys_pizzaria:pizza_oven",
-	groups = {cracky = 3, level = 1, pizza_oven = 1},
+	groups = {cracky = 3, level = 1, pizza_oven = 1, not_in_creative_inventory=1},
 	tiles = {
 		{
 			name = "jelys_pizzaria_pizza_oven_active_animated.png",
@@ -249,10 +248,9 @@ minetest.register_node("jelys_pizzaria:pizza_oven_active", {
 })
 
 minetest.register_node("jelys_pizzaria:pizza_oven_fueled", {
-	description = "Pizza Oven",
 	drawtype = "mesh",
 	paramtype2 = "facedir",
-	groups = {cracky = 3, level = 1, pizza_oven = 1},
+	groups = {cracky = 3, level = 1, pizza_oven = 1, not_in_creative_inventory=1},
 	tiles = {
 		"jelys_pizzaria_pizza_oven_fueled.png",
 	},
@@ -285,7 +283,7 @@ minetest.register_node("jelys_pizzaria:pizza_oven", {
 		meta:set_float("cook_time_elapsed", 0)
 		meta:set_float("cook_time", 0)
 		meta:set_float("fuel_time", 0)
-		
+
 		start_timer(pos, 0)
 	end,
 	mesh = "jelys_pizzaria_pizza_oven.obj",
@@ -294,7 +292,7 @@ minetest.register_node("jelys_pizzaria:pizza_oven", {
 	after_destruct = after_destruct,
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		local itemstack = player:get_wielded_item()
-		
+
 		if minetest.get_item_group(itemstack:get_name(), "tree") > 0 then
 			if not minetest.is_creative_enabled(player:get_player_name()) then
 				itemstack:take_item()
