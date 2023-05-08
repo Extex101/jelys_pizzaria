@@ -158,6 +158,8 @@ local function punch_pepperoni(pos, oldnode, digger)
 	return true
 end
 
+
+
 minetest.register_node("jelys_pizzaria:pepperoni_uncured", {
 	description = "Uncured Pepperoni",
 	inventory_image = "jelys_pizzaria_meat_pepperoni_uncured_inv.png",
@@ -183,8 +185,9 @@ minetest.register_node("jelys_pizzaria:pepperoni_uncured", {
 	on_place = function(itemstack, placer, pointed_thing)
 		if pointed_thing.type == "node" then
 			local pos = pointed_thing.above
-			local upnode = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z})
-			if minetest.is_protected(upnode, placer:get_player_name()) then
+			local uppos = {x=pos.x, y=pos.y+1, z=pos.z}
+			local upnode = minetest.get_node(uppos)
+			if minetest.is_protected(uppos, placer:get_player_name()) then
 				return minetest.item_place(itemstack, placer, pointed_thing)
 			end
 			if minetest.registered_nodes[upnode.name].walkable == false then
