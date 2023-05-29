@@ -320,17 +320,19 @@ minetest.register_node("jelys_pizzaria:pizza_box_closed", {
 	on_dig = function(pos, node, player)
 		local meta = minetest.get_meta(pos)
 		local contents = meta:get_string("pizza")
-		if contents == "" or contents == nil then return end
 		local inv = player:get_inventory()
 		local item = ItemStack("jelys_pizzaria:pizza_box_closed")
 		local imeta = item:get_meta()
-		local def = minetest.registered_nodes[contents]
-		imeta:set_string("pizza", contents)
-		imeta:set_string("description", def.description)
+		if type(contents) == "string" and string.len(contents) > 0 then
+			local def = minetest.registered_nodes[contents]
+			imeta:set_string("pizza", contents)
+			imeta:set_string("description", def.description)
+		end
+
 		if inv:room_for_item("main", item) then
 			inv:add_item("main", item)
 			minetest.remove_node(pos)
-			return
+			return true
 		end
 	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
