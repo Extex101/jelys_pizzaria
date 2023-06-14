@@ -129,6 +129,7 @@ minetest.register_craft({
 minetest.register_craftitem("jelys_pizzaria:hainac_slice", {
 	description = "Slice of \"Heart attack in a circle\" pizza",
 	inventory_image = "jelys_pizzaria_hainac_slice.png",
+	groups = {food = 1},
 	on_use = function(itemstack, player, pointed_thing)
 		minetest.after(1, function(itemstack, player, pointed_thing)
 			if player:get_hp() > 0 then

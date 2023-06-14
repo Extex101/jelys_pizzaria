@@ -120,6 +120,7 @@ function jpizza.make_pizzas()
 			description = "Slice of "..base.name.." Pizza",
 			inventory_image = "jelys_pizzaria_pizza_slice.png^"..base.topping_inv[2],
 			stack_max = 6,
+			groups = {food = 1},
 			on_use = minetest.item_eat(1+base.eat)
 		})
 		if jpizza.has_depends.hunger_ng then
@@ -181,9 +182,10 @@ function jpizza.make_pizzas()
 					description = "Slice of "..base.name.." and "..side.name.." Pizza",
 					inventory_image = "jelys_pizzaria_pizza_slice.png^"..base.topping_inv[num1].."^"..side.topping_inv[num2],
 					stack_max = 6,
+					groups = {food = 1},
 					on_use = minetest.item_eat(1+base.eat+side.eat)
 				})
-				minetest.register_alias(pizza_name.."_slice", "jelys_pizzaria:pizza_"..side.name.."_"..base.name)--yeah this shouldn't be a problem except for modders
+				minetest.register_alias(pizza_name.."_slice", "jelys_pizzaria:pizza_"..side.name.."_"..base.name)
 				if jpizza.has_depends.hunger_ng == true then
 					hunger_ng.add_hunger_data(pizza_name.."_slice", {satiates = 1+base.eat+side.eat})
 				end

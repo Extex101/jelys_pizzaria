@@ -138,6 +138,7 @@ minetest.register_craftitem("jelys_pizzaria:cheese_pizza_slice", {
 	description = "Slice of Cheese Pizza",
 	stack_max = 6,
 	inventory_image = "jelys_pizzaria_pizza_slice.png",
+	groups = {food = 1},
 	on_use = minetest.item_eat(1),
 })
 

@@ -145,7 +145,7 @@ local function start_timer(pos, elapsed)
 	--Infotext
 	local infotext = "Pizza: 100%\nFuel: none;"
 
-	local fuel_percentage = math.ceil(0.5+fuel_time/fuel*98)
+	local fuel_percentage = math.max(math.ceil(0.5+fuel_time/fuel*98), 0)
 	local cook_percentage = math.floor(0.5+cook_time_elapsed/cook_time*99)
 
 	if mode == "nopizza" then
