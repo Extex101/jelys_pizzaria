@@ -80,7 +80,6 @@ jpizza.register_pizza("jelys_pizzaria:dough_with_sauce", {
 		"jelys_pizzaria_pizza_dough.png^jelys_pizzaria_pizza_sauce.png",
 		"jelys_pizzaria_pizza_dough.png"
 	},
-	drop = "jelys_pizzaris:dough",
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		if itemstack:get_name() == "jelys_pizzaria:cheese" then
 			minetest.set_node(pos, {name="jelys_pizzaria:raw_cheese_pizza"})
