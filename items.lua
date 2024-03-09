@@ -74,7 +74,7 @@ if jpizza.has_depends.hunger_ng then
 	hunger_ng.add_hunger_data("jelys_pizzaria:burnt_pizza_slice", {satiates = -3, heals = -2})
 	hunger_ng.add_hunger_data("jelys_pizzaria:cheese_pizza_slice", {satiates = 1})
 end
-if jpizza.has_depends.hbhunger then
+if jpizza.has_depends.hbhunger and minetest.global_exists("hbhunger") then
 	hbhunger.register_food("jelys_pizzaria:burnt_pizza_slice", 0, "", 2)
 	hbhunger.register_food("jelys_pizzaria:cheese_pizza_slice", 1)
 end
