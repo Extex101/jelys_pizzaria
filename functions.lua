@@ -126,7 +126,7 @@ function jpizza.make_pizzas()
 		if jpizza.has_depends.hunger_ng then
 			hunger_ng.add_hunger_data("jelys_pizzaria:pizza_"..base.name.."_slice", {satiates = 1+base.eat})
 		end
-		if jpizza.has_depends.hbhunger then
+		if jpizza.has_depends.hbhunger and minetest.global_exists("hbhunger") then
 			hbhunger.register_food("jelys_pizzaria:pizza_"..base.name.."_slice", 1+base.eat)
 		end
 		for j = i, #jpizza.toppings, 1 do
@@ -189,7 +189,7 @@ function jpizza.make_pizzas()
 				if jpizza.has_depends.hunger_ng == true then
 					hunger_ng.add_hunger_data(pizza_name.."_slice", {satiates = 1+base.eat+side.eat})
 				end
-				if jpizza.has_depends.hbhunger == true then
+				if jpizza.has_depends.hbhunger and minetest.global_exists("hbhunger") then
 					hbhunger.register_food(pizza_name.."_slice", 1+base.eat+side.eat)
 				end
 			end
