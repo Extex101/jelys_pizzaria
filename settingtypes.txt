@@ -1,0 +1,2 @@
+# Whether pizza items should appear in dungeon chests, disabling will make the rare "haiac pizza" unobtainable, (Requires dungeon_loot)
+jelys_pizzaria.enable_dungeon_loot (Add Pizza items to dungeon_loot table) bool true

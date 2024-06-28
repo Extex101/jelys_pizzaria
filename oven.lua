@@ -261,7 +261,7 @@ minetest.register_node("jelys_pizzaria:pizza_oven_fueled", {
 	after_destruct = after_destruct,
 	on_punch = function(pos, node, player)
 		local itemstack = player:get_wielded_item()
-		if itemstack:get_name() == "default:torch" then
+		if itemstack:get_name() == "default:torch" or itemstack:get_name() == "fire:flint_and_steel" then
 			swap_node(pos, "jelys_pizzaria:pizza_oven_active")
 			start_timer(pos, 0)
 		end

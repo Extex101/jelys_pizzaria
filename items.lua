@@ -162,7 +162,7 @@ minetest.register_craft({
 	recipe = {h,h,h,h,h,h},
 })
 
-if jpizza.has_depends.dungeon_loot then
+if jpizza.has_depends.dungeon_loot and minetest.settings:get_bool("jelys_pizzaria.enable_dungeon_loot") then
 	
 	--Cheese
 	dungeon_loot.register({

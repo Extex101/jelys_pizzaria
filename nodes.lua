@@ -421,8 +421,8 @@ if jpizza.has_depends.stairs then
 			"jelys_pizzaria_reinforced_brick.png^[transformFX",
 			"jelys_pizzaria_reinforced_brick.png"
 		},
-		"Reinforced Brick stair",
-		"Reinforced Brick slab",
+		"Reinforced Brick Stair",
+		"Reinforced Brick Slab",
 		default.node_sound_stone_defaults(),
 		false
 	)
