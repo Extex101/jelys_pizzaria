@@ -266,6 +266,10 @@ minetest.register_node("jelys_pizzaria:pizza_oven_fueled", {
 			start_timer(pos, 0)
 		end
 	end,
+	on_ignite = function(pos, igniter)
+		swap_node(pos, "jelys_pizzaria:pizza_oven_active")
+		start_timer(pos, 0)
+	end,
 	on_rightclick = rightclick,
 	on_timer = start_timer,
 	sounds = default.node_sound_stone_defaults(),
