@@ -172,6 +172,7 @@ minetest.register_node("jelys_pizzaria:pepperoni_uncured", {
 		"jelys_pizzaria_meat_pepperoni_uncured.png^[transformFX",
 		"jelys_pizzaria_meat_pepperoni_uncured.png^[transformFX"
 	},
+	use_texture_alpha = true,
 	drawtype = "nodebox",
 	paramtype = "light",
 	sunlight_propagates = true,
@@ -235,6 +236,7 @@ minetest.register_node("jelys_pizzaria:pepperoni_cured", {
 		"jelys_pizzaria_meat_pepperoni_cured.png^[transformFX",
 		"jelys_pizzaria_meat_pepperoni_cured.png^[transformFX"
 	},
+	use_texture_alpha = true,
 	drawtype = "nodebox",
 	paramtype = "light",
 	sunlight_propagates = true,
